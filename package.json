@@ -2,12 +2,12 @@
 	"name": "webauth-i-challenge",
 	"version": "1.0.0",
 	"main": "index.js",
-	"scripts": {
-		"server": "nodemon index.js"
-	},
 	"repository": "https://github.com/jkaddu/webauth-i-challenge.git",
 	"author": "jkaddu <jkaddu@yahoo.com>",
 	"license": "MIT",
+	"scripts": {
+		"server": "nodemon index.js"
+	},
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
 		"express": "^4.16.4",
