@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const bcrypt = require('bcryptjs'); // <<<<<<< added and used for hashing
+const session = require('express-session'); // <<<<<<<< added for sessionConfig
 
 const db = require('./data/dbConfig.js');
 const Users = require('./users/users-model.js');
@@ -8,6 +9,19 @@ const protected = require('./auth/protected.js');
 
 const server = express();
 
+const sessionConfig = {
+	name: 'coded',
+	secret: 'kept secret, keep it guarded! Teacher',
+	cookie: {
+		httpOnly: true,
+		maxAge: 1000 * 60 * 1,
+		secure: false
+	},
+	resave: false,
+	saveUninitialized: true
+};
+
+server.use(session(sessionConfig));
 server.use(helmet());
 server.use(express.json());
 
@@ -35,7 +49,8 @@ server.post('/api/login', (req, res) => {
 		.then((user) => {
 			//
 			if (user && bcrypt.compareSync(password, user.password)) {
-				res.status(200).json({ message: `Welcome ${user.username}!` });
+				res.session.username = user.username;
+				res.status(200).json({ message: `Welcome ${user.username}, here's a cookie!` });
 			} else {
 				res.status(401).json({ message: 'Invalid Credentials' });
 			}
@@ -43,6 +58,20 @@ server.post('/api/login', (req, res) => {
 		.catch((error) => {
 			res.status(500).json(error);
 		});
+});
+
+router.get('/logout', (req, res) => {
+	if (req.session) {
+		req.session.destroy((err) => {
+			if (err) {
+				res.send('Whoops.');
+			} else {
+				res.send('Bye');
+			}
+		});
+	} else {
+		res.send('Already logged out.');
+	}
 });
 
 server.get('/api/users', protected, (req, res) => {
