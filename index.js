@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs'); // <<<<<<< added and used for hashing
 
 const db = require('./data/dbConfig.js');
 const Users = require('./users/users-model.js');
+const protected = require('./auth/protected.js');
 
 const server = express();
 
@@ -51,27 +52,6 @@ server.get('/api/users', protected, (req, res) => {
 		})
 		.catch((err) => res.send(err));
 });
-
-function protected(req, res, next) {
-	const { username, password } = req.headers;
-
-	if (username && password) {
-		Users.findBy({ username })
-			.first()
-			.then((user) => {
-				if (user && bcrypt.compareSync(password, user.password)) {
-					next();
-				} else {
-					res.status(401).json({ message: 'Invalid Credentials' });
-				}
-			})
-			.catch((error) => {
-				res.status(500).json(error);
-			});
-	} else {
-		res.status(400).json({ message: 'Please provide credentials' });
-	}
-}
 
 const port = 4000;
 server.listen(port, () => console.log(`\n*** Listening on 4k ***\n`));
